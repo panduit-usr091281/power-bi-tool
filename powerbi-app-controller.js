@@ -36,6 +36,8 @@
     const optGenerateMeasures = document.getElementById('opt-generate-measures');
     const optGenerateDateTable = document.getElementById('opt-generate-date-table');
 
+    const sectionVisualPresets = document.getElementById('section-visual-presets');
+
     const sectionGenerate = document.getElementById('section-generate');
     const btnGenerate = document.getElementById('btn-generate-pbit');
 
@@ -99,6 +101,7 @@
         dropZone.classList.remove('hidden');
         sectionPreview.classList.add('hidden');
         sectionRelationships.classList.add('hidden');
+        sectionVisualPresets.classList.add('hidden');
         sectionOptions.classList.add('hidden');
         sectionGenerate.classList.add('hidden');
         sectionOutput.classList.add('hidden');
@@ -109,12 +112,14 @@
     function renderAll() {
         renderTablePreview();
         renderRelationships();
+        populateVisualPresets();
         showSections();
     }
 
     function showSections() {
         sectionPreview.classList.remove('hidden');
         sectionRelationships.classList.remove('hidden');
+        sectionVisualPresets.classList.remove('hidden');
         sectionOptions.classList.remove('hidden');
         sectionGenerate.classList.remove('hidden');
         sectionOutput.classList.add('hidden');
@@ -137,24 +142,45 @@
             const table = parsedData.tables[tableName];
             html += `
                 <div class="table-card">
-                    <div class="table-card-header">
-                        <h3>${escapeHtml(tableName)}</h3>
+                    <div class="table-card-header table-card-toggle" data-table="${escapeHtml(tableName)}">
+                        <div class="table-card-header-left">
+                            <span class="collapse-chevron">▶</span>
+                            <h3>${escapeHtml(tableName)}</h3>
+                        </div>
                         <span class="badge badge-sm">${schema.rowCount} rows × ${schema.columns.length} cols</span>
                     </div>
-                    <div class="table-card-columns">
-                        ${schema.columns.map(col => `
-                            <div class="col-tag">
-                                <span class="col-name">${escapeHtml(col.name)}</span>
-                                <span class="col-type type-${col.dataType}">${col.dataType}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="table-card-preview">
-                        ${renderPreviewTable(table, schema)}
+                    <div class="table-card-body collapsed" data-table-body="${escapeHtml(tableName)}">
+                        <div class="table-card-columns">
+                            ${schema.columns.map(col => `
+                                <div class="col-tag">
+                                    <span class="col-name">${escapeHtml(col.name)}</span>
+                                    <span class="col-type type-${col.dataType}">${col.dataType}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="table-card-preview">
+                            ${renderPreviewTable(table, schema)}
+                        </div>
                     </div>
                 </div>`;
         }
         tablesPreviewContainer.innerHTML = html;
+
+        // Bind collapse toggles
+        tablesPreviewContainer.querySelectorAll('.table-card-toggle').forEach(header => {
+            header.addEventListener('click', () => {
+                const name = header.dataset.table;
+                const body = tablesPreviewContainer.querySelector(`[data-table-body="${name}"]`);
+                const chevron = header.querySelector('.collapse-chevron');
+                if (body.classList.contains('collapsed')) {
+                    body.classList.remove('collapsed');
+                    chevron.textContent = '▼';
+                } else {
+                    body.classList.add('collapsed');
+                    chevron.textContent = '▶';
+                }
+            });
+        });
     }
 
     function renderPreviewTable(table, schema) {
@@ -363,6 +389,143 @@
     });
 
     // --- Utilities ---
+
+    // --- Visual Presets ---
+
+    const presetToggles = {
+        map:   document.getElementById('preset-toggle-map'),
+        gantt: document.getElementById('preset-toggle-gantt'),
+        count: document.getElementById('preset-toggle-count')
+    };
+
+    const presetBodies = {
+        map:   document.getElementById('preset-body-map'),
+        gantt: document.getElementById('preset-body-gantt'),
+        count: document.getElementById('preset-body-count')
+    };
+
+    // Toggle preset body visibility when switch is flipped
+    Object.keys(presetToggles).forEach(key => {
+        presetToggles[key].addEventListener('change', () => {
+            if (presetToggles[key].checked) {
+                presetBodies[key].classList.remove('hidden');
+            } else {
+                presetBodies[key].classList.add('hidden');
+            }
+        });
+    });
+
+    // When count source table changes, repopulate its category column dropdown
+    const countTableSelect = document.getElementById('count-col-table');
+    const countCategorySelect = document.getElementById('count-col-category');
+    countTableSelect.addEventListener('change', () => {
+        populatePresetColumnSelect(countTableSelect.value, countCategorySelect, 'all');
+    });
+
+    function populateVisualPresets() {
+        if (!parsedData) return;
+
+        // Gather all columns across all tables (qualified: "Table.Column")
+        const allColumns = [];
+        const dateColumns = [];
+        const stringColumns = [];
+        const numericColumns = [];
+        const tableNames = Object.keys(parsedData.schemas);
+
+        for (const [tableName, schema] of Object.entries(parsedData.schemas)) {
+            for (const col of schema.columns) {
+                const qualified = tableName + '.' + col.name;
+                allColumns.push({ qualified, table: tableName, name: col.name, type: col.dataType });
+                if (col.dataType === 'dateTime') dateColumns.push({ qualified, table: tableName, name: col.name });
+                if (col.dataType === 'string') stringColumns.push({ qualified, table: tableName, name: col.name });
+                if (['int64', 'double', 'decimal'].includes(col.dataType)) numericColumns.push({ qualified, table: tableName, name: col.name });
+            }
+        }
+
+        // Helper: populate a <select> with columns, optionally filtered
+        function fillSelect(selectEl, columns, placeholder) {
+            selectEl.innerHTML = `<option value="">${placeholder || '— select —'}</option>` +
+                columns.map(c => `<option value="${escapeHtml(c.qualified)}">${escapeHtml(c.qualified)}</option>`).join('');
+        }
+
+        // Map preset: prefer string columns for geo, numeric for value
+        fillSelect(document.getElementById('map-col-country'), stringColumns, '— select —');
+        fillSelect(document.getElementById('map-col-state'), stringColumns, '— select —');
+        fillSelect(document.getElementById('map-col-city'), stringColumns, '— select —');
+        fillSelect(document.getElementById('map-col-value'), numericColumns, '— none —');
+
+        // Auto-detect likely geo columns
+        autoSelectByHint(document.getElementById('map-col-country'), stringColumns, ['country', 'nation', 'region']);
+        autoSelectByHint(document.getElementById('map-col-state'), stringColumns, ['state', 'province', 'region', 'territory']);
+        autoSelectByHint(document.getElementById('map-col-city'), stringColumns, ['city', 'town', 'municipality', 'location']);
+
+        // Gantt preset: string for task, date for start/end
+        fillSelect(document.getElementById('gantt-col-task'), stringColumns, '— select —');
+        fillSelect(document.getElementById('gantt-col-start'), dateColumns, '— select —');
+        fillSelect(document.getElementById('gantt-col-end'), dateColumns, '— select —');
+        fillSelect(document.getElementById('gantt-col-category'), stringColumns, '— none —');
+
+        autoSelectByHint(document.getElementById('gantt-col-task'), stringColumns, ['task', 'name', 'item', 'title', 'activity', 'project']);
+        autoSelectByHint(document.getElementById('gantt-col-start'), dateColumns, ['start', 'begin', 'from', 'start_date', 'startdate']);
+        autoSelectByHint(document.getElementById('gantt-col-end'), dateColumns, ['end', 'finish', 'to', 'due', 'end_date', 'enddate', 'deadline']);
+
+        // Count preset: table selector + category column
+        const countTableSel = document.getElementById('count-col-table');
+        countTableSel.innerHTML = tableNames.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+        populatePresetColumnSelect(countTableSel.value, countCategorySelect, 'all');
+    }
+
+    function populatePresetColumnSelect(tableName, selectEl, filter) {
+        if (!tableName || !parsedData.schemas[tableName]) return;
+        const cols = parsedData.schemas[tableName].columns;
+        const filtered = filter === 'all' ? cols : cols.filter(c => c.dataType === filter);
+        selectEl.innerHTML = `<option value="">— select —</option>` +
+            filtered.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)} (${c.dataType})</option>`).join('');
+    }
+
+    function autoSelectByHint(selectEl, columns, hints) {
+        for (const hint of hints) {
+            const match = columns.find(c => c.name.toLowerCase().includes(hint));
+            if (match) {
+                selectEl.value = match.qualified;
+                return;
+            }
+        }
+    }
+
+    /** Gather selected visual presets for downstream use */
+    function getSelectedPresets() {
+        const presets = [];
+        if (presetToggles.map.checked) {
+            presets.push({
+                type: 'map',
+                country: document.getElementById('map-col-country').value,
+                state: document.getElementById('map-col-state').value,
+                city: document.getElementById('map-col-city').value,
+                value: document.getElementById('map-col-value').value
+            });
+        }
+        if (presetToggles.gantt.checked) {
+            presets.push({
+                type: 'gantt',
+                task: document.getElementById('gantt-col-task').value,
+                startDate: document.getElementById('gantt-col-start').value,
+                endDate: document.getElementById('gantt-col-end').value,
+                category: document.getElementById('gantt-col-category').value
+            });
+        }
+        if (presetToggles.count.checked) {
+            presets.push({
+                type: 'count',
+                table: document.getElementById('count-col-table').value,
+                category: document.getElementById('count-col-category').value,
+                chartType: document.getElementById('count-chart-type').value
+            });
+        }
+        return presets;
+    }
+
+    // --- End Visual Presets ---
 
     const HTML_ESCAPE_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
     function escapeHtml(str) {

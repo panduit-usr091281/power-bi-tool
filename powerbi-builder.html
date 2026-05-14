@@ -112,9 +112,124 @@
             </div>
         </section>
 
-        <!-- Step 4: Options -->
+        <!-- Step 4: Visual Presets -->
+        <section class="input-section hidden" id="section-visual-presets">
+            <h2><span class="step-number">4</span> Visual Element Presets</h2>
+            <p class="section-description">Select pre-configured visuals to include in your Power BI template. Each preset maps to columns detected in your data.</p>
+            <div class="preset-grid" id="preset-grid">
+
+                <!-- Map View -->
+                <div class="preset-card" data-preset="map">
+                    <div class="preset-card-header">
+                        <div class="preset-icon preset-icon-map" aria-hidden="true">🗺️</div>
+                        <div class="preset-title">
+                            <h3>Hierarchical Map</h3>
+                            <span class="preset-subtitle">Country → State → City</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="preset-toggle-map">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="preset-card-body hidden" id="preset-body-map">
+                        <div class="preset-mapping">
+                            <div class="input-group">
+                                <label for="map-col-country">Country Column</label>
+                                <select id="map-col-country"><option value="">— select —</option></select>
+                            </div>
+                            <div class="input-group">
+                                <label for="map-col-state">State / Region Column</label>
+                                <select id="map-col-state"><option value="">— select —</option></select>
+                            </div>
+                            <div class="input-group">
+                                <label for="map-col-city">City Column</label>
+                                <select id="map-col-city"><option value="">— select —</option></select>
+                            </div>
+                            <div class="input-group">
+                                <label for="map-col-value">Value / Size Column <span class="optional-label">(optional)</span></label>
+                                <select id="map-col-value"><option value="">— none —</option></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline / Gantt -->
+                <div class="preset-card" data-preset="gantt">
+                    <div class="preset-card-header">
+                        <div class="preset-icon preset-icon-gantt" aria-hidden="true">📅</div>
+                        <div class="preset-title">
+                            <h3>Timeline / Gantt Chart</h3>
+                            <span class="preset-subtitle">Start → End date bars</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="preset-toggle-gantt">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="preset-card-body hidden" id="preset-body-gantt">
+                        <div class="preset-mapping">
+                            <div class="input-group">
+                                <label for="gantt-col-task">Task / Item Column</label>
+                                <select id="gantt-col-task"><option value="">— select —</option></select>
+                            </div>
+                            <div class="input-group">
+                                <label for="gantt-col-start">Start Date Column</label>
+                                <select id="gantt-col-start"><option value="">— select —</option></select>
+                            </div>
+                            <div class="input-group">
+                                <label for="gantt-col-end">End Date Column</label>
+                                <select id="gantt-col-end"><option value="">— select —</option></select>
+                            </div>
+                            <div class="input-group">
+                                <label for="gantt-col-category">Category / Group Column <span class="optional-label">(optional)</span></label>
+                                <select id="gantt-col-category"><option value="">— none —</option></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Count Graph -->
+                <div class="preset-card" data-preset="count">
+                    <div class="preset-card-header">
+                        <div class="preset-icon preset-icon-count" aria-hidden="true">📊</div>
+                        <div class="preset-title">
+                            <h3>Total Count Graph</h3>
+                            <span class="preset-subtitle">Count records by category</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="preset-toggle-count">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="preset-card-body hidden" id="preset-body-count">
+                        <div class="preset-mapping">
+                            <div class="input-group">
+                                <label for="count-col-category">Count By (Category Column)</label>
+                                <select id="count-col-category"><option value="">— select —</option></select>
+                            </div>
+                            <div class="input-group">
+                                <label for="count-col-table">Source Table</label>
+                                <select id="count-col-table"><option value="">— select —</option></select>
+                            </div>
+                            <div class="input-group">
+                                <label for="count-chart-type">Chart Type</label>
+                                <select id="count-chart-type">
+                                    <option value="bar">Bar Chart</option>
+                                    <option value="column">Column Chart</option>
+                                    <option value="pie">Pie Chart</option>
+                                    <option value="donut">Donut Chart</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Step 5: Options -->
         <section class="input-section hidden" id="section-options">
-            <h2><span class="step-number">4</span> Options</h2>
+            <h2><span class="step-number">5</span> Options</h2>
             <div class="input-row">
                 <div class="input-group">
                     <label for="opt-excel-path">Excel File Path (for Power BI connection)</label>

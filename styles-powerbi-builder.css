@@ -368,3 +368,166 @@
     transform: scale(1.1);
     accent-color: var(--accent-blue);
 }
+
+/* ===== Collapsible Table Cards ===== */
+
+.table-card-toggle {
+    cursor: pointer;
+    user-select: none;
+}
+
+.table-card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.collapse-chevron {
+    display: inline-block;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+    width: 1em;
+    text-align: center;
+}
+
+.table-card-body {
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.25s ease, padding 0.3s ease;
+    max-height: 800px;
+    opacity: 1;
+    padding-top: 0.75rem;
+}
+
+.table-card-body.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+}
+
+/* ===== Visual Element Presets ===== */
+
+.section-description {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.preset-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.preset-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 247, 246, 0.94));
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.preset-card:has(input:checked) {
+    border-color: rgba(15, 108, 189, 0.36);
+    box-shadow: 0 0 0 2px rgba(15, 108, 189, 0.10), var(--shadow-sm);
+}
+
+.preset-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+}
+
+.preset-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.preset-title {
+    flex: 1;
+}
+
+.preset-title h3 {
+    font-size: 0.95rem;
+    color: var(--text);
+    margin: 0;
+}
+
+.preset-subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.preset-card-body {
+    padding: 0 1rem 1rem;
+    transition: max-height 0.3s ease, opacity 0.25s ease, padding 0.3s ease;
+    max-height: 400px;
+    opacity: 1;
+}
+
+.preset-card-body.hidden {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 1rem;
+    overflow: hidden;
+}
+
+.preset-mapping {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.optional-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+/* Toggle switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 999px;
+    transition: background 0.25s;
+}
+
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.25s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background: var(--accent-blue, #0f6cbd);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(20px);
+}
