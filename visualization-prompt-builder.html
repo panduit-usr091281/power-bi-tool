@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization Prompt Builder</title>
+    <link rel="stylesheet" href="styles-prompt-builder.css">
+</head>
+<body class="app-shell prompt-builder-shell">
+    <header class="app-header prompt-header">
+        <div class="header-commandbar">
+            <div class="brand-lockup">
+                <div class="brand-mark" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="brand-copy">
+                    <p class="eyebrow">Prompt Design Workspace</p>
+                    <h1>Data Visualization Prompt Builder</h1>
+                    <p class="subtitle">Shape chart-ready prompts with the same report-first discipline found in Microsoft analytics tools.</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="powerbi-builder.html" class="nav-link nav-link-emphasis">Open Power BI Generator</a>
+            </div>
+        </div>
+        <div class="header-summary" aria-label="Workspace capabilities">
+            <span class="summary-pill">Structured intake</span>
+            <span class="summary-pill">Smart chart guidance</span>
+            <span class="summary-pill">Audience-aware prompts</span>
+            <span class="summary-pill summary-pill-accent">Power BI-inspired shell</span>
+        </div>
+    </header>
+
+    <main class="workspace-shell">
+        <aside class="workspace-sidebar">
+            <section class="sidebar-card sidebar-card-intro">
+                <p class="sidebar-label">Workspace Overview</p>
+                <h2>Build prompts like report specs</h2>
+                <p>Capture the dataset, set the decision context, and generate prompt text that feels ready for dashboards, notebooks, or presentation workflows.</p>
+            </section>
+
+            <section class="sidebar-card">
+                <p class="sidebar-label">Recommended Flow</p>
+                <ol class="workflow-list">
+                    <li>Parse and inspect the dataset preview.</li>
+                    <li>Define the business story and audience.</li>
+                    <li>Apply optional chart and output overrides.</li>
+                    <li>Generate a prompt ready for downstream tools.</li>
+                </ol>
+            </section>
+
+            <section class="sidebar-card sidebar-card-accent">
+                <p class="sidebar-label">Visual Language</p>
+                <div class="palette-preview" aria-hidden="true">
+                    <span class="palette-chip palette-chip-gold"></span>
+                    <span class="palette-chip palette-chip-blue"></span>
+                    <span class="palette-chip palette-chip-ink"></span>
+                    <span class="palette-chip palette-chip-neutral"></span>
+                </div>
+                <p class="sidebar-note">Neutral panels, Segoe UI typography, crisp borders, and Power BI gold accents keep the interface closer to Microsoft&rsquo;s product language.</p>
+            </section>
+        </aside>
+
+        <div class="app-container">
+            <!-- Step 1: Data Input -->
+            <section class="input-section" id="section-data-input">
+                <div class="section-heading">
+                    <div>
+                        <p class="section-label">Data Intake</p>
+                        <h2><span class="step-number">1</span> Enter Your Data</h2>
+                    </div>
+                    <p class="section-caption">Parse the source first so the preview can confirm the structure before you tune the prompt.</p>
+                </div>
+            <div class="input-group">
+                <label for="data-format-select">Data Format</label>
+                <select id="data-format-select">
+                    <option value="csv">CSV (Comma-Separated)</option>
+                    <option value="tsv">TSV (Tab-Separated)</option>
+                    <option value="json">JSON Array</option>
+                    <option value="manual">Manual Entry (Key-Value Pairs)</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="data-text-input">Paste or Type Your Data</label>
+                <textarea id="data-text-input" rows="10" placeholder="Example CSV:
+Month,Sales,Expenses
+Jan,45000,32000
+Feb,52000,34000
+Mar,48000,31000
+Apr,61000,35000"></textarea>
+            </div>
+            <button class="btn-primary" id="btn-parse-data">Parse Data</button>
+            <div id="data-preview-container" class="preview-container hidden">
+                <h3>Data Preview</h3>
+                <div id="data-preview-table"></div>
+                <p id="data-summary-text"></p>
+            </div>
+            </section>
+
+            <!-- Step 2: Visualization Context -->
+            <section class="input-section" id="section-context-details">
+                <div class="section-heading">
+                    <div>
+                        <p class="section-label">Story Framing</p>
+                        <h2><span class="step-number">2</span> Describe the Context</h2>
+                    </div>
+                    <p class="section-caption">Set the business question, audience, and emphasis so the generated prompt reads like a design brief.</p>
+                </div>
+            <div class="input-group">
+                <label for="viz-title-input">Visualization Title</label>
+                <input type="text" id="viz-title-input" placeholder="e.g., Q1 2026 Sales Performance">
+            </div>
+            <div class="input-group">
+                <label for="viz-purpose-select">Purpose of Visualization</label>
+                <select id="viz-purpose-select">
+                    <option value="comparison">Compare values across categories</option>
+                    <option value="trend">Show trends over time</option>
+                    <option value="composition">Show parts of a whole</option>
+                    <option value="distribution">Show data distribution</option>
+                    <option value="relationship">Show relationships between variables</option>
+                    <option value="geographic">Display geographic/spatial data</option>
+                    <option value="flow">Show process or flow</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="viz-audience-select">Target Audience</label>
+                <select id="viz-audience-select">
+                    <option value="executive">Executive / C-Suite</option>
+                    <option value="technical">Technical Team</option>
+                    <option value="general">General / Public</option>
+                    <option value="academic">Academic / Research</option>
+                    <option value="marketing">Marketing / Sales</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="viz-notes-input">Additional Notes (optional)</label>
+                <textarea id="viz-notes-input" rows="3" placeholder="Any specific callouts, annotations, or details to highlight..."></textarea>
+            </div>
+            </section>
+
+            <!-- Step 3: Style Preferences -->
+            <section class="input-section" id="section-style-preferences">
+                <div class="section-heading">
+                    <div>
+                        <p class="section-label">Delivery Controls</p>
+                        <h2><span class="step-number">3</span> Style Preferences (Optional Overrides)</h2>
+                    </div>
+                    <p class="section-caption">Override chart, palette, and delivery tool only when you want to steer the output away from auto-detected recommendations.</p>
+                </div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="viz-type-override">Chart Type (auto-detected if blank)</label>
+                    <select id="viz-type-override">
+                        <option value="auto">Auto-detect best type</option>
+                        <option value="bar">Bar Chart</option>
+                        <option value="line">Line Chart</option>
+                        <option value="pie">Pie Chart</option>
+                        <option value="donut">Donut Chart</option>
+                        <option value="scatter">Scatter Plot</option>
+                        <option value="area">Area Chart</option>
+                        <option value="heatmap">Heatmap</option>
+                        <option value="treemap">Treemap</option>
+                        <option value="radar">Radar / Spider Chart</option>
+                        <option value="funnel">Funnel Chart</option>
+                        <option value="waterfall">Waterfall Chart</option>
+                        <option value="histogram">Histogram</option>
+                        <option value="box">Box Plot</option>
+                        <option value="bubble">Bubble Chart</option>
+                        <option value="stacked-bar">Stacked Bar Chart</option>
+                        <option value="grouped-bar">Grouped Bar Chart</option>
+                        <option disabled>──────────────────</option>
+                        <option value="infographic">Infographic (Creative Visual)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="color-scheme-override">Color Scheme (auto-selected if blank)</label>
+                    <select id="color-scheme-override">
+                        <option value="auto">Auto-select best palette</option>
+                        <option value="corporate-blue">Corporate Blue</option>
+                        <option value="warm-sunset">Warm Sunset</option>
+                        <option value="cool-ocean">Cool Ocean</option>
+                        <option value="earth-tones">Earth Tones</option>
+                        <option value="high-contrast">High Contrast</option>
+                        <option value="monochrome">Monochrome</option>
+                        <option value="pastel">Pastel</option>
+                        <option value="vibrant">Vibrant / Bold</option>
+                        <option value="dark-mode">Dark Mode Optimized</option>
+                        <option value="accessible">Colorblind Accessible</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="output-tool-select">Target Tool / Library</label>
+                    <select id="output-tool-select">
+                        <option value="any">Any (LLM decides)</option>
+                        <option value="matplotlib">Python - Matplotlib</option>
+                        <option value="seaborn">Python - Seaborn</option>
+                        <option value="plotly">Python - Plotly</option>
+                        <option value="chartjs">JavaScript - Chart.js</option>
+                        <option value="d3">JavaScript - D3.js</option>
+                        <option value="vega">Vega-Lite</option>
+                        <option value="excel">Excel Chart</option>
+                        <option value="tableau">Tableau</option>
+                        <option value="powerbi">Power BI</option>
+                        <option value="image-only">Image Only (no code)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="output-dimensions-input">Dimensions (optional)</label>
+                    <input type="text" id="output-dimensions-input" placeholder="e.g., 1200x800 or 16:9">
+                </div>
+            </div>
+            </section>
+
+            <!-- Generate Button -->
+            <div class="generate-section">
+                <p class="generate-copy">Create a structured prompt with recommended chart type, palette, audience framing, and tool guidance.</p>
+                <button class="btn-generate" id="btn-generate-prompt">Generate Visualization Prompt</button>
+            </div>
+
+            <!-- Output Section -->
+            <section class="output-section hidden" id="section-prompt-output">
+                <div class="section-heading">
+                    <div>
+                        <p class="section-label">Result</p>
+                        <h2>Generated Prompt</h2>
+                    </div>
+                    <p class="section-caption">Review the suggested metadata, then copy the full prompt into your target assistant, notebook, or reporting workflow.</p>
+                </div>
+                <div class="output-meta" id="output-meta-info"></div>
+                <div class="output-prompt-wrapper">
+                    <button class="btn-copy" id="btn-copy-prompt" title="Copy to clipboard">Copy</button>
+                    <pre id="generated-prompt-output"></pre>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <p>Data Visualization Prompt Builder &mdash; A Microsoft-style workspace for structured chart and infographic prompt generation</p>
+    </footer>
+
+    <script src="data-analysis-engine.js"></script>
+    <script src="infographic-prompt-engine.js"></script>
+    <script src="prompt-generation-engine.js"></script>
+    <script src="app-controller.js"></script>
+</body>
+</html>

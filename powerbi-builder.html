@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power BI Generator — Excel to .pbit</title>
+    <link rel="stylesheet" href="styles-prompt-builder.css">
+    <link rel="stylesheet" href="styles-powerbi-builder.css">
+    <!-- SheetJS for Excel parsing in the browser -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <!-- JSZip for .pbit (ZIP) creation in the browser -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- FileSaver for triggering downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body class="app-shell powerbi-shell">
+    <header class="app-header pbi-header">
+        <div class="header-commandbar">
+            <div class="brand-lockup">
+                <div class="brand-mark brand-mark-powerbi" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="brand-copy">
+                    <p class="eyebrow">Template Workspace</p>
+                    <h1>Power BI Generator</h1>
+                    <p class="subtitle">Upload an Excel file to generate a Power BI Template (.pbit) with auto-detected relationships.</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="visualization-prompt-builder.html" class="nav-link">Back to Prompt Builder</a>
+            </div>
+        </div>
+        <div class="header-summary" aria-label="Power BI workflow capabilities">
+            <span class="summary-pill">Excel ingestion</span>
+            <span class="summary-pill">Sheet-aware parsing</span>
+            <span class="summary-pill">Relationship detection</span>
+            <span class="summary-pill summary-pill-accent">.pbit output</span>
+        </div>
+    </header>
+
+    <main class="app-container">
+        <!-- Step 1: File Upload -->
+        <section class="input-section" id="section-file-upload">
+            <h2><span class="step-number">1</span> Upload Excel File</h2>
+            <div class="upload-area" id="drop-zone">
+                <div class="upload-icon" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <p class="upload-text">Drag &amp; drop an <strong>.xlsx</strong> file here, or click to browse</p>
+                <p class="upload-hint">Each sheet becomes a table in Power BI</p>
+                <input type="file" id="file-input" accept=".xlsx,.xls" class="file-input-hidden">
+            </div>
+            <div id="file-info" class="file-info hidden">
+                <span id="file-name-display"></span>
+                <button class="btn-small btn-remove" id="btn-remove-file">✕ Remove</button>
+            </div>
+        </section>
+
+        <!-- Step 2: Table Preview & Schema -->
+        <section class="input-section hidden" id="section-table-preview">
+            <h2><span class="step-number">2</span> Detected Tables</h2>
+            <div id="tables-summary" class="tables-summary"></div>
+            <div id="tables-preview-container"></div>
+        </section>
+
+        <!-- Step 3: Relationships -->
+        <section class="input-section hidden" id="section-relationships">
+            <h2><span class="step-number">3</span> Detected Relationships</h2>
+            <div id="relationships-container"></div>
+            <div class="rel-actions">
+                <button class="btn-primary" id="btn-add-relationship">+ Add Relationship</button>
+            </div>
+            <div id="add-rel-form" class="add-rel-form hidden">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="rel-from-table">From Table</label>
+                        <select id="rel-from-table"></select>
+                    </div>
+                    <div class="input-group">
+                        <label for="rel-from-col">From Column</label>
+                        <select id="rel-from-col"></select>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="rel-to-table">To Table</label>
+                        <select id="rel-to-table"></select>
+                    </div>
+                    <div class="input-group">
+                        <label for="rel-to-col">To Column</label>
+                        <select id="rel-to-col"></select>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="rel-cardinality">Cardinality</label>
+                        <select id="rel-cardinality">
+                            <option value="manyToOne">Many to One</option>
+                            <option value="oneToOne">One to One</option>
+                            <option value="manyToMany">Many to Many</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="display:flex;align-items:flex-end;">
+                        <button class="btn-primary" id="btn-confirm-add-rel">Add</button>
+                        <button class="btn-small" id="btn-cancel-add-rel" style="margin-left:0.5rem;">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 4: Options -->
+        <section class="input-section hidden" id="section-options">
+            <h2><span class="step-number">4</span> Options</h2>
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="opt-excel-path">Excel File Path (for Power BI connection)</label>
+                    <input type="text" id="opt-excel-path" placeholder="C:\Users\YourName\Documents\my-file.xlsx">
+                    <p class="input-help">Enter the workbook's real Windows path. Browser uploads do not expose your local file path to JavaScript.</p>
+                </div>
+            </div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label>
+                        <input type="checkbox" id="opt-generate-measures" checked>
+                        Generate DAX measures for numeric columns
+                    </label>
+                </div>
+                <div class="input-group">
+                    <label>
+                        <input type="checkbox" id="opt-generate-date-table" checked>
+                        Generate Date dimension table (if dates exist)
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Generate Button -->
+        <div class="generate-section hidden" id="section-generate">
+            <button class="btn-generate" id="btn-generate-pbit">Generate &amp; Download .pbit</button>
+        </div>
+
+        <!-- Output / Status -->
+        <section class="output-section hidden" id="section-output">
+            <h2>Generation Complete</h2>
+            <div id="output-summary" class="output-meta"></div>
+            <div class="output-prompt-wrapper">
+                <button class="btn-copy" id="btn-copy-schema" title="Copy model schema JSON">Copy Schema</button>
+                <pre id="output-schema-json"></pre>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>Power BI Generator &mdash; Upload Excel, auto-detect relationships, download .pbit template</p>
+    </footer>
+
+    <script src="powerbi-excel-parser.js?v=20260512-12"></script>
+    <script src="powerbi-relationship-detector.js?v=20260512-12"></script>
+    <script src="powerbi-pbit-generator.js?v=20260512-12"></script>
+    <script src="powerbi-app-controller.js?v=20260512-12"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Runner - Data Visualization Prompt Builder</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            background: #f8fafc;
+            color: #1e293b;
+        }
+        h1 { color: #1e40af; margin-bottom: 0.25rem; }
+        .subtitle { color: #64748b; margin-bottom: 1.5rem; }
+        #test-results-output {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Runner</h1>
+    <p class="subtitle">Automated tests for Data Analysis Engine &amp; Prompt Generation Engine</p>
+    <div id="test-results-output">Running tests...</div>
+
+    <script src="data-analysis-engine.js"></script>
+    <script src="prompt-generation-engine.js"></script>
+    <script src="test-prompt-builder.js"></script>
+</body>
+</html>

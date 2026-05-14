@@ -1,0 +1,370 @@
+/* ===========================================
+   styles-powerbi-builder.css
+   Additional styles specific to the Power BI
+   Generator page (extends styles-prompt-builder.css)
+   =========================================== */
+
+/* Header variant */
+.pbi-header {
+    background: linear-gradient(135deg, rgba(32, 31, 30, 0.98) 0%, rgba(39, 37, 36, 0.98) 45%, rgba(15, 38, 66, 0.96) 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.pbi-header::before {
+    background: linear-gradient(180deg, #f2c811, #ffb900);
+}
+
+.pbi-header h1 {
+    color: #fff;
+}
+
+.pbi-header .eyebrow,
+.pbi-header .subtitle {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.pbi-header .summary-pill {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.pbi-header .summary-pill-accent {
+    background: rgba(242, 200, 17, 0.2);
+    border-color: rgba(242, 200, 17, 0.36);
+    color: #ffe27a;
+}
+
+.pbi-header .nav-link {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.16);
+    color: rgba(255, 255, 255, 0.9);
+    box-shadow: none;
+}
+
+.pbi-header .nav-link:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(242, 200, 17, 0.34);
+    color: #fff;
+}
+
+.brand-mark-powerbi span {
+    background: linear-gradient(180deg, #fff0ab 0%, #f2c811 100%);
+}
+
+/* Upload Area */
+.upload-area {
+    border: 1.5px dashed rgba(242, 200, 17, 0.4);
+    border-radius: 18px;
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    background: linear-gradient(180deg, rgba(255, 244, 206, 0.46), rgba(255, 255, 255, 0.86));
+    transition: border-color 0.2s, background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.upload-area:hover,
+.upload-area.drag-over {
+    border-color: rgba(15, 108, 189, 0.42);
+    background: linear-gradient(180deg, rgba(255, 244, 206, 0.78), rgba(222, 236, 249, 0.64));
+    transform: translateY(-1px);
+    box-shadow: 0 16px 28px rgba(0, 0, 0, 0.08);
+}
+
+.upload-icon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 0.85rem;
+    padding: 12px;
+    display: inline-grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    align-items: end;
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(34, 39, 47, 0.92), rgba(18, 20, 24, 0.96));
+    box-shadow: 0 12px 22px rgba(0, 0, 0, 0.12);
+}
+
+.upload-icon span {
+    display: block;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #7fd1ff 0%, #0f6cbd 100%);
+}
+
+.upload-icon span:nth-child(1) {
+    height: 44%;
+}
+
+.upload-icon span:nth-child(2) {
+    height: 72%;
+}
+
+.upload-icon span:nth-child(3) {
+    height: 100%;
+    background: linear-gradient(180deg, #ffe27a 0%, #f2c811 100%);
+}
+
+.upload-text {
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+}
+
+.upload-hint {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.file-input-hidden {
+    display: none;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(180deg, rgba(255, 244, 206, 0.8), rgba(255, 255, 255, 0.92));
+    border: 1px solid rgba(242, 200, 17, 0.28);
+    border-radius: 12px;
+    margin-top: 0.75rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.btn-small {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--border-strong);
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s, border-color 0.2s;
+}
+
+.btn-small:hover {
+    background: #ffffff;
+    border-color: rgba(15, 108, 189, 0.24);
+    transform: translateY(-1px);
+}
+
+.btn-remove {
+    color: #dc2626;
+    border-color: rgba(220, 38, 38, 0.18);
+}
+
+.btn-remove:hover {
+    background: #fef2f2;
+}
+
+/* Summary Badges */
+.summary-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    background: rgba(255, 244, 206, 0.88);
+    color: #8a6c00;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid rgba(242, 200, 17, 0.28);
+}
+
+.badge-sm {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.badge-confidence {
+    background: #dcfce7;
+    color: #166534;
+}
+
+/* Table Cards */
+.table-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 247, 246, 0.94));
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.table-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.table-card-header h3 {
+    font-size: 1rem;
+    color: var(--text);
+}
+
+.table-card-columns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+}
+
+.col-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.5rem;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 0.78rem;
+}
+
+.col-name {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.col-type {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
+.col-type.type-string   { background: #e0f2fe; color: #0369a1; }
+.col-type.type-int64    { background: #fef3c7; color: #92400e; }
+.col-type.type-double   { background: #fef3c7; color: #92400e; }
+.col-type.type-decimal  { background: #fef3c7; color: #92400e; }
+.col-type.type-dateTime { background: #ede9fe; color: #6d28d9; }
+.col-type.type-boolean  { background: #dcfce7; color: #166534; }
+
+/* Table preview */
+.table-card-preview {
+    overflow-x: auto;
+}
+
+.table-card-preview table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+}
+
+.table-card-preview th,
+.table-card-preview td {
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--border);
+    text-align: left;
+    white-space: nowrap;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-card-preview th {
+    background: linear-gradient(180deg, rgba(255, 244, 206, 0.72), rgba(255, 255, 255, 0.96));
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.more-rows {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Relationships */
+.rel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.rel-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 247, 246, 0.94));
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.rel-visual {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.88rem;
+    flex-wrap: wrap;
+}
+
+.rel-table {
+    font-weight: 700;
+    color: var(--text);
+}
+
+.rel-dot {
+    color: var(--text-muted);
+}
+
+.rel-arrow {
+    margin: 0 0.25rem;
+    color: var(--accent-blue);
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.rel-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-icon {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #dc2626;
+    padding: 0.2rem;
+    line-height: 1;
+    transition: transform 0.1s;
+}
+
+.btn-icon:hover {
+    transform: scale(1.2);
+}
+
+.no-rels {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.rel-actions {
+    margin-top: 0.75rem;
+}
+
+.add-rel-form {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 247, 246, 0.94));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+/* Options checkboxes */
+.input-group label input[type="checkbox"] {
+    margin-right: 0.5rem;
+    transform: scale(1.1);
+    accent-color: var(--accent-blue);
+}
