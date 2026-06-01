@@ -29,11 +29,12 @@ const PbitGenerator = (() => {
         const excelPath = normalizeExcelPath(options.excelFilePath || 'C:\\Data\\YourFile.xlsx');
         const genMeasures = options.generateMeasures !== false;
         const genDateTable = options.generateDateTable !== false;
+        const visualPresets = options.visualPresets || [];
 
         const modelSchema = buildDataModelSchema(tables, schemas, relationships, excelPath, genMeasures, genDateTable);
         const modelJson = JSON.stringify(modelSchema, null, 2);
 
-        const reportLayout = buildReportLayout(tables, schemas, relationships, excelPath);
+        const reportLayout = buildReportLayout(tables, schemas, relationships, excelPath, visualPresets);
 
         const schemaUtf16 = encodeUTF16LE(modelJson, false);
 
@@ -517,7 +518,7 @@ const PbitGenerator = (() => {
         return lines.join('\n');
     }
 
-    function buildReportLayout(tables, schemas, relationships, excelPath) {
+    function buildReportLayout(tables, schemas, relationships, excelPath, visualPresets) {
         const reportConfig = {
             version: '5.50',
             themeCollection: {
@@ -639,24 +640,255 @@ const PbitGenerator = (() => {
             height: 720
         };
 
+        // --- Visuals page (3rd page) with preset visuals ---
+        const visualsSection = buildVisualsPage(visualPresets, schemas);
+
+        const sections = [
+            readmeSection,
+            {
+                name: 'ReportSection',
+                displayName: 'Data Overview',
+                filters: '[]',
+                ordinal: 1,
+                visualContainers: visualContainers,
+                config: JSON.stringify(sectionConfig),
+                width: 1280,
+                height: 720
+            }
+        ];
+
+        if (visualsSection) {
+            sections.push(visualsSection);
+        }
+
         return {
             id: 0,
             reportId: crypto.randomUUID ? crypto.randomUUID() : ('report-' + Date.now()),
-            sections: [
-                readmeSection,
-                {
-                    name: 'ReportSection',
-                    displayName: 'Data Overview',
-                    filters: '[]',
-                    ordinal: 1,
-                    visualContainers: visualContainers,
-                    config: JSON.stringify(sectionConfig),
-                    width: 1280,
-                    height: 720
-                }
-            ],
+            sections: sections,
             config: JSON.stringify(reportConfig),
             layoutOptimization: 0
+        };
+    }
+
+    // --- Build Visuals Page from Presets ---
+
+    function buildVisualsPage(presets, schemas) {
+        if (!presets || presets.length === 0) return null;
+
+        const visualContainers = [];
+        let vx = 30, vy = 30, zOrder = 0;
+
+        for (const preset of presets) {
+            let vc = null;
+            if (preset.type === 'arcgis-map') {
+                vc = buildArcGISMapVisual(preset, schemas, vx, vy, zOrder);
+            } else if (preset.type === 'gantt') {
+                vc = buildGanttVisual(preset, schemas, vx, vy, zOrder);
+            } else if (preset.type === 'count') {
+                vc = buildCountVisual(preset, schemas, vx, vy, zOrder);
+            }
+            if (vc) {
+                visualContainers.push(vc);
+                zOrder++;
+                vy += vc.height + 30;
+            }
+        }
+
+        if (visualContainers.length === 0) return null;
+
+        const sectionConfig = {
+            name: 'VisualsSection',
+            layouts: [{ id: 0, position: {} }],
+            singleVisualGroup: null
+        };
+
+        return {
+            name: 'VisualsSection',
+            displayName: 'Visuals',
+            filters: '[]',
+            ordinal: 2,
+            visualContainers: visualContainers,
+            config: JSON.stringify(sectionConfig),
+            width: 1280,
+            height: 720
+        };
+    }
+
+    function parseQualifiedColumn(qualified) {
+        const dotIdx = qualified.indexOf('.');
+        if (dotIdx < 0) return { table: '', column: qualified };
+        return { table: qualified.substring(0, dotIdx), column: qualified.substring(dotIdx + 1) };
+    }
+
+    function buildArcGISMapVisual(preset, schemas, x, y, z) {
+        const country = parseQualifiedColumn(preset.country || '');
+        const state = parseQualifiedColumn(preset.state || '');
+        const city = parseQualifiedColumn(preset.city || '');
+        const value = preset.value ? parseQualifiedColumn(preset.value) : null;
+
+        // Determine primary source table
+        const sourceTable = country.table || state.table || city.table || '';
+        if (!sourceTable) return null;
+
+        const fromSources = [{ Name: 's', Entity: sourceTable, Type: 0 }];
+        const selectItems = [];
+        const projections = { Category: [], Group: [] };
+
+        // Location hierarchy: country > state > city
+        if (country.column) {
+            selectItems.push({ Column: { Expression: { SourceRef: { Source: 's' } }, Property: country.column }, Name: sourceTable + '.' + country.column });
+            projections.Category.push({ queryRef: sourceTable + '.' + country.column, active: true });
+        }
+        if (state.column) {
+            selectItems.push({ Column: { Expression: { SourceRef: { Source: 's' } }, Property: state.column }, Name: sourceTable + '.' + state.column });
+            projections.Category.push({ queryRef: sourceTable + '.' + state.column, active: true });
+        }
+        if (city.column) {
+            selectItems.push({ Column: { Expression: { SourceRef: { Source: 's' } }, Property: city.column }, Name: sourceTable + '.' + city.column });
+            projections.Category.push({ queryRef: sourceTable + '.' + city.column, active: true });
+        }
+        if (value && value.column) {
+            selectItems.push({ Column: { Expression: { SourceRef: { Source: 's' } }, Property: value.column }, Name: sourceTable + '.' + value.column });
+            projections.Size = [{ queryRef: sourceTable + '.' + value.column }];
+        }
+
+        const vcName = crypto.randomUUID ? crypto.randomUUID() : ('arcgis_' + z + '_' + Date.now());
+        const vcConfig = {
+            name: vcName,
+            layouts: [{ id: 0, position: { x, y, z, width: 620, height: 450 } }],
+            singleVisual: {
+                visualType: 'esriVisual',
+                projections: projections,
+                prototypeQuery: {
+                    Version: 2,
+                    From: fromSources,
+                    Select: selectItems
+                },
+                drillFilterOtherVisuals: true,
+                objects: {
+                    general: [{
+                        properties: {
+                            basemap: { expr: { Literal: { Value: "'" + (preset.basemap || 'streets-vector') + "'" } } },
+                            layerType: { expr: { Literal: { Value: "'" + (preset.layerType || 'points') + "'" } } }
+                        }
+                    }]
+                }
+            }
+        };
+
+        return {
+            x, y, z,
+            width: 620,
+            height: 450,
+            config: JSON.stringify(vcConfig),
+            filters: '[]',
+            tabOrder: z
+        };
+    }
+
+    function buildGanttVisual(preset, schemas, x, y, z) {
+        const task = parseQualifiedColumn(preset.task || '');
+        const startDate = parseQualifiedColumn(preset.startDate || '');
+        const endDate = parseQualifiedColumn(preset.endDate || '');
+        const category = preset.category ? parseQualifiedColumn(preset.category) : null;
+
+        const sourceTable = task.table || startDate.table || '';
+        if (!sourceTable) return null;
+
+        const fromSources = [{ Name: 's', Entity: sourceTable, Type: 0 }];
+        const selectItems = [];
+        const projections = { Task: [], 'Start Date': [], Duration: [] };
+
+        if (task.column) {
+            selectItems.push({ Column: { Expression: { SourceRef: { Source: 's' } }, Property: task.column }, Name: sourceTable + '.' + task.column });
+            projections.Task.push({ queryRef: sourceTable + '.' + task.column });
+        }
+        if (startDate.column) {
+            selectItems.push({ Column: { Expression: { SourceRef: { Source: 's' } }, Property: startDate.column }, Name: sourceTable + '.' + startDate.column });
+            projections['Start Date'].push({ queryRef: sourceTable + '.' + startDate.column });
+        }
+        if (endDate.column) {
+            selectItems.push({ Column: { Expression: { SourceRef: { Source: 's' } }, Property: endDate.column }, Name: sourceTable + '.' + endDate.column });
+            projections.Duration.push({ queryRef: sourceTable + '.' + endDate.column });
+        }
+        if (category && category.column) {
+            selectItems.push({ Column: { Expression: { SourceRef: { Source: 's' } }, Property: category.column }, Name: sourceTable + '.' + category.column });
+            projections.Legend = [{ queryRef: sourceTable + '.' + category.column }];
+        }
+
+        const vcName = crypto.randomUUID ? crypto.randomUUID() : ('gantt_' + z + '_' + Date.now());
+        const vcConfig = {
+            name: vcName,
+            layouts: [{ id: 0, position: { x, y, z, width: 1220, height: 350 } }],
+            singleVisual: {
+                visualType: 'gantt',
+                projections: projections,
+                prototypeQuery: {
+                    Version: 2,
+                    From: fromSources,
+                    Select: selectItems
+                },
+                drillFilterOtherVisuals: true
+            }
+        };
+
+        return {
+            x, y, z,
+            width: 1220,
+            height: 350,
+            config: JSON.stringify(vcConfig),
+            filters: '[]',
+            tabOrder: z
+        };
+    }
+
+    function buildCountVisual(preset, schemas, x, y, z) {
+        const sourceTable = preset.table || '';
+        const categoryCol = preset.category || '';
+        if (!sourceTable || !categoryCol) return null;
+
+        const chartTypeMap = {
+            bar: 'barChart',
+            column: 'columnChart',
+            pie: 'pieChart',
+            donut: 'donutChart'
+        };
+        const visualType = chartTypeMap[preset.chartType] || 'columnChart';
+
+        const fromSources = [{ Name: 's', Entity: sourceTable, Type: 0 }];
+        const selectItems = [
+            { Column: { Expression: { SourceRef: { Source: 's' } }, Property: categoryCol }, Name: sourceTable + '.' + categoryCol },
+            { Aggregation: { Expression: { Column: { Expression: { SourceRef: { Source: 's' } }, Property: categoryCol } }, Function: 5 }, Name: 'CountOf.' + categoryCol }
+        ];
+
+        const projections = {
+            Category: [{ queryRef: sourceTable + '.' + categoryCol }],
+            Y: [{ queryRef: 'CountOf.' + categoryCol }]
+        };
+
+        const vcName = crypto.randomUUID ? crypto.randomUUID() : ('count_' + z + '_' + Date.now());
+        const vcConfig = {
+            name: vcName,
+            layouts: [{ id: 0, position: { x, y, z, width: 600, height: 400 } }],
+            singleVisual: {
+                visualType: visualType,
+                projections: projections,
+                prototypeQuery: {
+                    Version: 2,
+                    From: fromSources,
+                    Select: selectItems
+                },
+                drillFilterOtherVisuals: true
+            }
+        };
+
+        return {
+            x, y, z,
+            width: 600,
+            height: 400,
+            config: JSON.stringify(vcConfig),
+            filters: '[]',
+            tabOrder: z
         };
     }
 

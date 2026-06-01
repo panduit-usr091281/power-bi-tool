@@ -118,13 +118,13 @@
             <p class="section-description">Select pre-configured visuals to include in your Power BI template. Each preset maps to columns detected in your data.</p>
             <div class="preset-grid" id="preset-grid">
 
-                <!-- Map View -->
+                <!-- Map View (ArcGIS) -->
                 <div class="preset-card" data-preset="map">
                     <div class="preset-card-header">
                         <div class="preset-icon preset-icon-map" aria-hidden="true">🗺️</div>
                         <div class="preset-title">
-                            <h3>Hierarchical Map</h3>
-                            <span class="preset-subtitle">Country → State → City</span>
+                            <h3>ArcGIS Map</h3>
+                            <span class="preset-subtitle">Hierarchical: Country → State → City</span>
                         </div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="preset-toggle-map">
@@ -133,6 +133,17 @@
                     </div>
                     <div class="preset-card-body hidden" id="preset-body-map">
                         <div class="preset-mapping">
+                            <div class="input-group">
+                                <label for="map-basemap">ArcGIS Basemap</label>
+                                <select id="map-basemap">
+                                    <option value="dark-gray-vector">Dark Gray Canvas</option>
+                                    <option value="gray-vector">Light Gray Canvas</option>
+                                    <option value="streets-vector" selected>Streets</option>
+                                    <option value="topo-vector">Topographic</option>
+                                    <option value="satellite">Imagery</option>
+                                    <option value="oceans">Oceans</option>
+                                </select>
+                            </div>
                             <div class="input-group">
                                 <label for="map-col-country">Country Column</label>
                                 <select id="map-col-country"><option value="">— select —</option></select>
@@ -148,6 +159,14 @@
                             <div class="input-group">
                                 <label for="map-col-value">Value / Size Column <span class="optional-label">(optional)</span></label>
                                 <select id="map-col-value"><option value="">— none —</option></select>
+                            </div>
+                            <div class="input-group">
+                                <label for="map-layer-type">Location Type</label>
+                                <select id="map-layer-type">
+                                    <option value="points" selected>Points</option>
+                                    <option value="heatmap">Heat Map</option>
+                                    <option value="clustering">Clustering</option>
+                                </select>
                             </div>
                         </div>
                     </div>

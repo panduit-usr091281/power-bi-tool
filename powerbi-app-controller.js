@@ -338,7 +338,8 @@
                 excelFilePath,
                 generateMeasures: optGenerateMeasures.checked,
                 generateDateTable: optGenerateDateTable.checked,
-                fileName: parsedData.fileName
+                fileName: parsedData.fileName,
+                visualPresets: getSelectedPresets()
             };
 
             const result = await PbitGenerator.generate(
@@ -498,7 +499,10 @@
         const presets = [];
         if (presetToggles.map.checked) {
             presets.push({
-                type: 'map',
+                type: 'arcgis-map',
+                visualType: 'esriVisual',
+                basemap: document.getElementById('map-basemap').value,
+                layerType: document.getElementById('map-layer-type').value,
                 country: document.getElementById('map-col-country').value,
                 state: document.getElementById('map-col-state').value,
                 city: document.getElementById('map-col-city').value,
